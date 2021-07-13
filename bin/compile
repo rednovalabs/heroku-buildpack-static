@@ -2,6 +2,7 @@
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
 set -euo pipefail
+set -x
 
 build_dir=$1
 cache_dir=$2
@@ -21,9 +22,14 @@ case "${STACK}" in
     ;;
 esac
 
+echo "          -> downloading $nginx_archive_url"
+
 mkdir -p $build_dir/bin
+echo "          -> curl | tar"
 curl -sSf --retry 3 --connect-timeout 3 "${nginx_archive_url}" | tar -xzC "${build_dir}/bin"
+echo "          -> ${build_dir}/bin/nginx"
 nginx_version=$("${build_dir}/bin/nginx" -v |& cut -d '/' -f 2-)
+echo "          -> cp"
 cp -a $bp_dir/scripts/{boot,config} -t $build_dir/bin/
 echo "-----> Installed nginx ${nginx_version} to /app/bin"
 
